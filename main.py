@@ -109,7 +109,7 @@ i = 0
 surf = display
 def renderHandler():
     global i, scale, surf
-    if i >= zooms: # the last one
+    if i >= zooms:
         i = zooms
         scale = finalZoomSize
 
