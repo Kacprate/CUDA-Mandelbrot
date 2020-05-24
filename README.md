@@ -10,4 +10,4 @@ Mandelbrot set rendered using CUDA
 - T - increase max iterations
 - G - decrease max iterations
 
-![Example](https://raw.githubusercontent.com/Kacprate/CUDA-Mandelbrot/master/example_image.jpg | width=100)
+![Example](https://raw.githubusercontent.com/Kacprate/CUDA-Mandelbrot/master/example_image.jpg)
