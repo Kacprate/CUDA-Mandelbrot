@@ -1,7 +1,7 @@
 # CUDA-Mandelbrot
 Mandelbrot set rendered using CUDA
 
-Controlls:
+# Controlls:
 - WSAD - move
 - E - zoom in
 - Q - zoom out
@@ -9,3 +9,5 @@ Controlls:
 - F - decrease cursor speed
 - T - increase max iterations
 - G - decrease max iterations
+
+![Example](https://github.com/Kacprate/CUDA-Mandelbrot/blob/master/example_image.jpg)
