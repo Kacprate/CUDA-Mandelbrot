@@ -271,16 +271,15 @@ while running:
             center['y'] += movey / scale
         renderHandler(movex, movey, update)
     display.blit(surf, (0, 0))
-    if not update:
-        update = True
+
+    fps = 1000
+    if deltaTime != 0:
+        fps = 1/deltaTime
+    if AUTO_LOWER_CURSORSPEED and fps < 15 and cursorSpeed > 300:
+        cursorSpeed -= 50
+        if cursorSpeed < 300:
+            cursorSpeed = 300
     if showInfo:
-        fps = 60
-        if deltaTime != 0:
-            fps = 1/deltaTime
-        if AUTO_LOWER_CURSORSPEED and fps < 15 and cursorSpeed > 300:
-            cursorSpeed -= 50
-            if cursorSpeed < 300:
-                cursorSpeed = 300
         font = pygame.font.SysFont(None, fontSize)
         text = dataBoard(i, scale, finalZoomSize, maxIterations, zooms, zoomCoeff, cursorSpeed, fps)
         label = []
@@ -288,6 +287,7 @@ while running:
             label.append(font.render(line, True, (0, 0, 0)))
         for line in range(len(label)):
             display.blit(label[line],(10 , 10 + (line*fontSize)+(5*line)))
-    
+    if not update:
+        update = True
     pygame.display.update()
 pygame.quit()
