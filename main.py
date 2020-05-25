@@ -119,8 +119,8 @@ def step_kernel(d_image, screenX, screenY, cX, cY, maxIterations, scale):
 def lerp(a, b, t):
     return a + (b - a) * t
 
-def dataBoard(i, s, fzs, mi, fi, zc, cs):
-    return ["Step: " + str(i), " - zooming progress: " + str(math.floor(i / fi * 100)) + "%", " - scaling per step: ~x" + str(math.floor(zc * 1000) / 1000), "Zoom: x" + str(s), "Target zoom: x" + str(fzs), "Maximum function iterations per pixel: " + str(mi), "Coordinates:", " Re = " + str(-center['x']), " Im = " + str(center['y']), "Resolution: " + str(screen['x']) + "x" + str(screen['y']), "Cursor speed: " + str(cs)]
+def dataBoard(i, s, fzs, mi, fi, zc, cs, fps):
+    return ["Step: " + str(i), " - zooming progress: " + str(math.floor(i / fi * 100)) + "%", " - scaling per step: ~x" + str(math.floor(zc * 1000) / 1000), "Zoom: x" + str(s), "Target zoom: x" + str(fzs), "Maximum function iterations per pixel: " + str(mi), "Coordinates:", " Re = " + str(-center['x']), " Im = " + str(center['y']), "Resolution: " + str(screen['x']) + "x" + str(screen['y']), "Cursor speed: " + str(cs), "FPS: " + str(int(fps))]
 
 def renderHandler():
     global i, scale, surf
@@ -192,8 +192,9 @@ while running:
         renderHandler()
     display.blit(surf, (0, 0))
     if showInfo:
+        fps = 1/deltaTime
         font = pygame.font.SysFont(None, fontSize)
-        text = dataBoard(i, scale, finalZoomSize, maxIterations, zooms, zoomCoeff, cursorSpeed)
+        text = dataBoard(i, scale, finalZoomSize, maxIterations, zooms, zoomCoeff, cursorSpeed, fps)
         label = []
         for line in text: 
             label.append(font.render(line, True, (0, 0, 0)))
