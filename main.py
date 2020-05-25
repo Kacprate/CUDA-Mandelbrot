@@ -35,6 +35,7 @@ center = {'x' : 1.768778833 + 20/15857146760, 'y' : -0.001738996}
 #---------------SETTINGS---------------
 screen = {'x' : 800, 'y' : 800} # screen size
 startMaxIterations = 50 # initial maximum iterations
+AUTO_LOWER_CURSORSPEED = True # automatically lowers the cursor speed if the performance drops
 DEBUG = False # debug features
 cursorSpeed = 300 # initial cursor movement speed, 300 is optimal for good performance, too low might cause no movement at all, too high might lower the framerate significantly
 fontSize = 20 # information display font size
@@ -270,10 +271,16 @@ while running:
             center['y'] += movey / scale
         renderHandler(movex, movey, update)
     display.blit(surf, (0, 0))
+    if not update:
+        update = True
     if showInfo:
-        fps = 1
+        fps = 60
         if deltaTime != 0:
             fps = 1/deltaTime
+        if AUTO_LOWER_CURSORSPEED and fps < 15 and cursorSpeed > 300:
+            cursorSpeed -= 50
+            if cursorSpeed < 300:
+                cursorSpeed = 300
         font = pygame.font.SysFont(None, fontSize)
         text = dataBoard(i, scale, finalZoomSize, maxIterations, zooms, zoomCoeff, cursorSpeed, fps)
         label = []
@@ -282,7 +289,5 @@ while running:
         for line in range(len(label)):
             display.blit(label[line],(10 , 10 + (line*fontSize)+(5*line)))
     
-    if not update:
-        update = True
     pygame.display.update()
 pygame.quit()
