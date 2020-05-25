@@ -36,7 +36,7 @@ center = {'x' : 1.768778833 + 20/15857146760, 'y' : -0.001738996}
 screen = {'x' : 800, 'y' : 800} # screen size
 startMaxIterations = 50 # initial maximum iterations
 DEBUG = False # debug features
-cursorSpeed = 300 # movement speed
+cursorSpeed = 300 # initial cursor movement speed, 300 is optimal for good performance
 fontSize = 20 # information display font size
 showInfo = True # toggle information display on/off
 #CUDA SETTINGS 
@@ -53,11 +53,13 @@ flags = pygame.DOUBLEBUF
 display = pygame.display.set_mode((screen['x'], screen['y']), flags)
 display.set_alpha(None)
 image = np.zeros((int(screen['x']), int(screen['y']), 3), dtype = np.float)
+surf = pygame.surfarray.make_surface(image)
 i = 0
 surf = display
 zoomCoeff = 1
 if zooms != 0:
     zoomCoeff = (finalZoomSize / scale) ** (1/zooms)
+update = False
 
 # pygame loop variables
 running = True
@@ -148,7 +150,6 @@ def sign(x):
 def dataBoard(i, s, fzs, mi, fi, zc, cs, fps):
     return ["Step: " + str(i), " - zooming progress: " + str(math.floor(i / fi * 100)) + "%", " - scaling per step: ~x" + str(math.floor(zc * 1000) / 1000), "Zoom: x" + str(s), "Target zoom: x" + str(fzs), "Maximum function iterations per pixel: " + str(mi), "Coordinates:", " Re = " + str(-center['x']), " Im = " + str(center['y']), "Resolution: " + str(screen['x']) + "x" + str(screen['y']), "Cursor speed: " + str(cs), "FPS: " + str(int(fps))]
 
-surf = pygame.surfarray.make_surface(image)
 def renderHandler(dx, dy, update):
     global i, scale, surf
     if i >= zooms:
@@ -207,7 +208,6 @@ def renderHandler(dx, dy, update):
         else:
             print("Surface render time: {} seconds".format(dt))
 
-update = False
 renderHandler(0, 0, update)
 while running:
     lastFrameTicks = t
@@ -257,8 +257,8 @@ while running:
         cursorSpeed += 1
     elif keyboard.is_pressed('f'):
         cursorSpeed -= 1
-        if cursorSpeed < 1:
-            cursorSpeed = 1
+        if cursorSpeed < 150:
+            cursorSpeed = 150
 
     if doRender:
         doRender = False
