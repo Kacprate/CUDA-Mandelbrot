@@ -36,7 +36,7 @@ center = {'x' : 1.768778833 + 20/15857146760, 'y' : -0.001738996}
 screen = {'x' : 800, 'y' : 800} # screen size
 startMaxIterations = 50 # initial maximum iterations
 DEBUG = False # debug features
-cursorSpeed = 300 # initial cursor movement speed, 300 is optimal for good performance
+cursorSpeed = 300 # initial cursor movement speed, 300 is optimal for good performance, too low might cause no movement at all, too high might lower the framerate significantly
 fontSize = 20 # information display font size
 showInfo = True # toggle information display on/off
 #CUDA SETTINGS 
