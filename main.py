@@ -35,7 +35,7 @@ center = {'x' : 1.768778833 + 20/15857146760, 'y' : -0.001738996}
 #---------------SETTINGS---------------
 screen = {'x' : 800, 'y' : 800} # screen size
 startMaxIterations = 50 # initial maximum iterations
-AUTO_LOWER_CURSORSPEED = True # automatically lowers the cursor speed if the performance drops
+AUTO_LOWER_CURSORSPEED = False # automatically lowers the cursor speed if the performance drops
 DEBUG = False # debug features
 cursorSpeed = 300 # initial cursor movement speed, 300 is optimal for good performance, too low might cause no movement at all, too high might lower the framerate significantly
 fontSize = 20 # information display font size
@@ -214,6 +214,9 @@ while running:
     lastFrameTicks = t
     t = pygame.time.get_ticks()
     deltaTime = (t - lastFrameTicks) / 1000.0
+    moveDelta = deltaTime
+    if moveDelta < 1/200:
+        moveDelta = 1/100
     movex, movey = 0, 0
 
     for event in pygame.event.get():
@@ -243,16 +246,16 @@ while running:
             elif event.key == pygame.K_i:
                 showInfo = not showInfo
     if keyboard.is_pressed('a'):
-        movex = math.floor(cursorSpeed * deltaTime)
+        movex = math.floor(cursorSpeed * moveDelta)
         doRender = True
     elif keyboard.is_pressed('d'):
-        movex = -math.floor(cursorSpeed * deltaTime)
+        movex = -math.floor(cursorSpeed * moveDelta)
         doRender = True
     if keyboard.is_pressed('w'):
-        movey = math.floor(cursorSpeed * deltaTime)
+        movey = math.floor(cursorSpeed * moveDelta)
         doRender = True
     elif keyboard.is_pressed('s'):
-        movey = -math.floor(cursorSpeed * deltaTime)
+        movey = -math.floor(cursorSpeed * moveDelta)
         doRender = True
     if keyboard.is_pressed('r'):
         cursorSpeed += 1
