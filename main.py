@@ -1,15 +1,23 @@
-from numba import cuda
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import time
+# CUDA Mandelbrot Set renderer made by Kacprate (https://github.com/Kacprate)
+
+import colorsys
 import math
 import sys
-import pygame
-import colorsys
+import time
+
 import keyboard
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import pygame
+from numba import cuda
 
 #---------------ZOOMING AND POSITION SETTINGS---------------
+# zooms is the amount of zooms, pressing the zoom-in button makes it zoom, but it can be done at most as many times as defined by zooms variable
+# finalZoomSize is the final zoom scale
+# scale is the initial zoom scale
+# center is the coordinates of the point we are aiming at
+
 zooms = 30
 finalZoomSize = 10000000000000000
 #finalZoomSize = 1000000000000000
@@ -22,23 +30,36 @@ center = {'x' : 19/30 + 12/3000 + 6/20000 - 16/50000000 + 4/50000000000 - 21/100
 #-----------------------------------------------------------
 
 #---------------SETTINGS---------------
-screen = {'x' : 800, 'y' : 800}
-startMaxIterations = 50
-finalMaxIterations = 290
-maxIterations = startMaxIterations
-DEBUG = True
-MARK_AIM = True
-cursorSpeed = 1
-fontSize = 20
-showInfo = True
-#CUDA SETTINGS
-griddim = (32, 16)
-blockdim = (32, 8)
+screen = {'x' : 800, 'y' : 800} # screen size
+startMaxIterations = 50 # initial maximum iterations
+DEBUG = True # debug features
+MARK_AIM = True # marks the aim at the center of the screen
+cursorSpeed = 1 # movement speed
+fontSize = 20 # information display font size
+showInfo = True # toggle information display on/off
+#CUDA SETTINGS 
+griddim = (32, 16) # dimensions of the grid
+blockdim = (32, 8) # dimensions of the block
 #--------------------------------------
 
 pygame.init()
+pygame.display.set_caption('CUDA Mandelbrot Set renderer by Kacprate')
+
+# renderer variables
+maxIterations = startMaxIterations
 display = pygame.display.set_mode((screen['x'], screen['y']))
 image = np.zeros((int(screen['x']), int(screen['y']), 3), dtype = np.float)
+i = 0
+surf = display
+zoomCoeff = 1
+if zooms != 0:
+    zoomCoeff = (finalZoomSize / scale) ** (1/zooms)
+
+# pygame loop variables
+running = True
+t = 0
+lastFrameTicks = 1
+doRender = True
 
 @cuda.jit(device=True)
 def HSVtoRGB(h, s, v):
@@ -101,12 +122,6 @@ def lerp(a, b, t):
 def dataBoard(i, s, fzs, mi, fi, zc, cs):
     return ["Step: " + str(i), " - zooming progress: " + str(math.floor(i / fi * 100)) + "%", " - scaling per step: ~x" + str(math.floor(zc * 1000) / 1000), "Zoom: x" + str(s), "Target zoom: x" + str(fzs), "Maximum function iterations per pixel: " + str(mi), "Coordinates:", " Re = " + str(-center['x']), " Im = " + str(center['y']), "Resolution: " + str(screen['x']) + "x" + str(screen['y']), "Cursor speed: " + str(cs)]
 
-zoomCoeff = 1
-if zooms != 0:
-    zoomCoeff = (finalZoomSize / scale) ** (1/zooms)
-
-i = 0
-surf = display
 def renderHandler():
     global i, scale, surf
     if i >= zooms:
@@ -126,11 +141,6 @@ def renderHandler():
 
     surf = pygame.surfarray.make_surface(image)
 
-running = True
-
-t = 0
-lastFrameTicks = 1
-doRender = True
 while running:
     lastFrameTicks = t
     t = pygame.time.get_ticks()
