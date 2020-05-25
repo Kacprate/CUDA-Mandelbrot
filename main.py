@@ -271,7 +271,7 @@ while running:
             center['y'] += movey / scale
         renderHandler(movex, movey, update)
     display.blit(surf, (0, 0))
-    fps = 1000
+    fps = 60
     if deltaTime != 0:
         fps = 1/deltaTime
     if AUTO_LOWER_CURSORSPEED and fps < 15 and cursorSpeed > 300:
