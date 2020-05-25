@@ -3,14 +3,12 @@
 # Changes:
 # - optimized the algorithm, now it's 3x more efficient
 
-import colorsys
 import math
 import sys
 import time
 
 import keyboard
 import matplotlib as mpl
-import matplotlib.pyplot as plt
 import numpy as np
 import pygame
 from numba import cuda
