@@ -264,9 +264,9 @@ while running:
     if doRender:
         doRender = False
         if movex != 0 or movey != 0:
-            leng = (movex ** 2 + movey ** 2) ** (1/2)
-            movex = int(movex ** 2/leng) * sign(movex)
-            movey = int(movey ** 2/leng) * sign(movey)
+            leng = abs(movex) + abs(movey)
+            movex = int(movex ** 2 / leng) * sign(movex)
+            movey = int(movey ** 2 / leng) * sign(movey)
             center['x'] += movex / scale
             center['y'] += movey / scale
         renderHandler(movex, movey, update)
