@@ -271,7 +271,6 @@ while running:
             center['y'] += movey / scale
         renderHandler(movex, movey, update)
     display.blit(surf, (0, 0))
-
     fps = 1000
     if deltaTime != 0:
         fps = 1/deltaTime
