@@ -8,7 +8,6 @@ import sys
 import time
 
 import keyboard
-import matplotlib as mpl
 import numpy as np
 import pygame
 from numba import cuda
