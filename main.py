@@ -47,7 +47,7 @@ pygame.display.set_caption('CUDA Mandelbrot Set renderer by Kacprate')
 
 # renderer variables
 maxIterations = startMaxIterations
-flags = pygame.DOUBLEBUF
+flags = pygame.DOUBLEBUF #| pygame.FULLSCREEN
 display = pygame.display.set_mode((screen['x'], screen['y']), flags)
 display.set_alpha(None)
 image = np.zeros((int(screen['x']), int(screen['y']), 3), dtype = np.float)
@@ -261,10 +261,6 @@ while running:
 
     if doRender:
         doRender = False
-        if scale >= 1000000000000000:
-            arbitraryPrecission = True
-        else:
-            arbitraryPrecission = False
         if movex != 0 or movey != 0:
             leng = abs(movex) + abs(movey)
             movex = int(movex ** 2 / leng) * sign(movex)
