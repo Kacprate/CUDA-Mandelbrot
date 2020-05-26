@@ -6,7 +6,7 @@
 import math
 import sys
 import time
-import mpmath as mpm
+
 import keyboard
 import numpy as np
 import pygame
@@ -46,8 +46,6 @@ pygame.init()
 pygame.display.set_caption('CUDA Mandelbrot Set renderer by Kacprate')
 
 # renderer variables
-mpm.mp.dps = 100
-arbitraryPrecission = False
 maxIterations = startMaxIterations
 flags = pygame.DOUBLEBUF
 display = pygame.display.set_mode((screen['x'], screen['y']), flags)
@@ -88,25 +86,16 @@ def HSVtoRGB(h, s, v):
     return r, g, b
 
 @cuda.jit(device=True)
-def iterate(d_image, x, i, j, screenY, cY, maxIterations, scale, arbitraryPrecission):
+def iterate(d_image, x, i, j, screenY, cY, maxIterations, scale):
     y = -(j - int(screenY / 2))
     y = y / scale - cY
-
-    # if arbitraryPrecission:
-    #     y = mpm.mpf(x)
-    #     y = mpm.mpf(y)
-
+    
     c = complex(x, y)
     z = complex(0, 0)
-    #ca, cb = x, y
-    #za, zb = 0.0, 0.0
 
     iteration = 1
     while iteration <= maxIterations:
         z = z**2 + c
-        #za = za ** 2 - zb ** 2 + ca
-        #zb = 2.0 * za * zb + cb
-
         if z.real ** 2 + z.imag ** 2 >= 4:
             break
         else:
@@ -126,7 +115,7 @@ def iterate(d_image, x, i, j, screenY, cY, maxIterations, scale, arbitraryPrecis
     d_image[indexA][indexB][2] = b
 
 @cuda.jit
-def step_kernel(d_image, screenX, screenY, cX, cY, maxIterations, scale, update, x1, x2, y1, y2, dx, dy, arbitraryPrecission):
+def step_kernel(d_image, screenX, screenY, cX, cY, maxIterations, scale, update, x1, x2, y1, y2, dx, dy):
     startX = cuda.blockDim.x * cuda.blockIdx.x + cuda.threadIdx.x
     startY = cuda.blockDim.y * cuda.blockIdx.y + cuda.threadIdx.y
     gridX = cuda.gridDim.x * cuda.blockDim.x;
@@ -140,13 +129,13 @@ def step_kernel(d_image, screenX, screenY, cX, cY, maxIterations, scale, update,
             x = i - int(screenX / 2)
             x = x / scale - cX
             for j in range(startY, screenY, gridY):
-                iterate(d_image, x, i, j, screenY, cY, maxIterations, scale, arbitraryPrecission)
+                iterate(d_image, x, i, j, screenY, cY, maxIterations, scale)
     if not update or dy != 0:
         for i in range(startX, screenX, gridX):
             x = i - int(screenX / 2)
             x = x / scale - cX
             for j in range(y1, y2, gridY):
-                iterate(d_image, x, i, j, screenY, cY, maxIterations, scale, arbitraryPrecission)
+                iterate(d_image, x, i, j, screenY, cY, maxIterations, scale)
 
 def lerp(a, b, t):
     return a + (b - a) * t
@@ -160,7 +149,7 @@ def sign(x):
         return 0
 
 def dataBoard(i, s, fzs, mi, fi, zc, cs, fps):
-    return ["Step: " + str(i), " - zooming progress: " + str(math.floor(i / fi * 100)) + "%", " - scaling per step: ~x" + str(math.floor(zc * 1000) / 1000), "Zoom: x" + str(s), "Target zoom: x" + str(fzs), "Maximum function iterations per pixel: " + str(mi), "Coordinates:", " Re = " + str(-center['x']), " Im = " + str(center['y']), "Resolution: " + str(screen['x']) + "x" + str(screen['y']), "Cursor speed: " + str(cs), "Arbitrary precission: " + str(arbitraryPrecission) ,"FPS: " + str(int(fps))]
+    return ["Step: " + str(i), " - zooming progress: " + str(math.floor(i / fi * 100)) + "%", " - scaling per step: ~x" + str(math.floor(zc * 1000) / 1000), "Zoom: x" + str(s), "Target zoom: x" + str(fzs), "Maximum function iterations per pixel: " + str(mi), "Coordinates:", " Re = " + str(-center['x']), " Im = " + str(center['y']), "Resolution: " + str(screen['x']) + "x" + str(screen['y']), "Cursor speed: " + str(cs), "FPS: " + str(int(fps))]
 
 def renderHandler(dx, dy, update):
     global i, scale, surf
@@ -185,7 +174,7 @@ def renderHandler(dx, dy, update):
         elif dy > 0:
             y1 = screen['y'] - dy
     t1 = time.time()
-    step_kernel[griddim, blockdim](d_image, int(screen['x']), int(screen['y']), center['x'], center['y'], maxIterations, scale, update, x1, x2, y1, y2, dx, dy, arbitraryPrecission)
+    step_kernel[griddim, blockdim](d_image, int(screen['x']), int(screen['y']), center['x'], center['y'], maxIterations, scale, update, x1, x2, y1, y2, dx, dy)
     d_image.to_host()
 
     if DEBUG:
@@ -196,10 +185,6 @@ def renderHandler(dx, dy, update):
     t1 = time.time()
     if update:
         surf.scroll(dx, dy)
-        # for x in range(x1, x2):
-        #     for y in range(y1, y2):
-        #         y = screen['y'] - y - 1
-        #         surf.set_at((x, y), image[x][y])
         if dx != 0:
             for x in range(x1, x2):
                 for y in range(0, screen['y']):
