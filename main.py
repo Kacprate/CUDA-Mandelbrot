@@ -53,6 +53,7 @@ flags = pygame.DOUBLEBUF
 display = pygame.display.set_mode((screen['x'], screen['y']), flags)
 display.set_alpha(None)
 image = np.zeros((int(screen['x']), int(screen['y']), 3), dtype = np.float)
+d_image = cuda.to_device(image)
 surf = pygame.surfarray.make_surface(image)
 i = 0
 surf = display
@@ -161,7 +162,6 @@ def sign(x):
 def dataBoard(i, s, fzs, mi, fi, zc, cs, fps):
     return ["Step: " + str(i), " - zooming progress: " + str(math.floor(i / fi * 100)) + "%", " - scaling per step: ~x" + str(math.floor(zc * 1000) / 1000), "Zoom: x" + str(s), "Target zoom: x" + str(fzs), "Maximum function iterations per pixel: " + str(mi), "Coordinates:", " Re = " + str(-center['x']), " Im = " + str(center['y']), "Resolution: " + str(screen['x']) + "x" + str(screen['y']), "Cursor speed: " + str(cs), "Arbitrary precission: " + str(arbitraryPrecission) ,"FPS: " + str(int(fps))]
 
-d_image = cuda.to_device(image)
 def renderHandler(dx, dy, update):
     global i, scale, surf
     if i >= zooms:
