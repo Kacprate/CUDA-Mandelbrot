@@ -1,0 +1,26 @@
+{
+    "resolution": {
+        "x": 800,
+        "y": 800
+    },
+
+    "default_center": {
+        "x": 0.6376330133924425,
+        "y": 0.49998799991601167
+    },
+
+    "zooms": 250,
+    "finalZoomSize": 10000000000000000,
+    "initial_scale": 250,
+    "startMaxIterations": 50,
+
+    "cursorSpeed": 300,
+    "fontSize": 20,
+
+    "AUTO_LOWER_CURSORSPEED": false,
+
+    "cuda": {
+        "griddim": [32, 16],
+        "blockdim": [32, 8]
+    }    
+}
