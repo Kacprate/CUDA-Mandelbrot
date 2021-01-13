@@ -10,5 +10,8 @@ Mandelbrot set rendered using CUDA
 - T - increase max iterations
 - G - decrease max iterations
 - I - toggle render information
+- P - save location
+- L - load location
+- M - remove saved location
 
 ![Example](https://raw.githubusercontent.com/Kacprate/CUDA-Mandelbrot/master/example_image.jpg)
