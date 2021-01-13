@@ -9,7 +9,7 @@ import numpy as np
 import pygame
 from numba import cuda
 
-from utils import lerp, sign, HSVtoRGB
+from modules.utils import lerp, sign, HSVtoRGB
 
 #---------------ZOOMING AND POSITION SETTINGS---------------
 # zooms is the amount of zooms, pressing the zoom-in button makes it zoom, but it can be done at most as many times as defined by zooms variable

@@ -1,10 +1,10 @@
+import json
 import math
 import time
-from bunch import Bunch
-import json
 
 import numpy as np
 import pygame
+from bunch import Bunch
 from numba import cuda
 
 from modules.utils import HSVtoRGB, step_kernel
@@ -47,26 +47,27 @@ class Renderer:
         self.cursorSpeed = data['cursorSpeed'] # initial cursor movement speed, 300 is optimal for good performance, too low might cause no movement at all, too high might lower the framerate significantly
         self.fontSize = data['fontSize'] # information display font size
 
-        #CUDA SETTINGS 
+        # CUDA SETTINGS 
         self.griddim = data['cuda']['griddim'] # dimensions of the grid
         self.blockdim = data['cuda']['blockdim'] # dimensions of the block
 
     def get_state(self):
-        state = Bunch()
-        state.center = self.center.copy()
-        state.i = self.i
-        state.cursorSpeed = self.cursorSpeed
-        state.scale = self.scale
-        state.maxIterations = self.maxIterations
+        state = dict()
+        state["center"] = self.center.copy()
+        state["i"] = self.i
+        state["cursorSpeed"] = self.cursorSpeed
+        state["scale"] = self.scale
+        state["maxIterations"] = self.maxIterations
+        state["timestamp"] = time.time()
         return state
 
     def load_state(self, state):
         try:
-            self.center = state.center.copy()
-            self.i = state.i
-            self.cursorSpeed = state.cursorSpeed
-            self.scale = state.scale
-            self.maxIterations = state.maxIterations
+            self.center = state["center"].copy()
+            self.i = state["i"]
+            self.cursorSpeed = state["cursorSpeed"]
+            self.scale = state["scale"]
+            self.maxIterations = state["maxIterations"]
         except:
             raise Exception("Error while loading the state")
 
