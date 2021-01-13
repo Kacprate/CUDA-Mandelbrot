@@ -44,8 +44,6 @@ save_manager.load()
 
 state_machine = State_Machine()
 
-
-
 renderer = Renderer(args.config)
 renderer.step(0, 0, False)
 
@@ -65,16 +63,12 @@ def run():
 
         pygame_events = pygame.event.get()
 
-        for event in pygame_events:
-            if event.type == pygame.QUIT:
-                return
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    return
-
         if state_machine.get_state().name == "choosing_save_to_load":
             for event in pygame_events:
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        state_machine.change_state("rendering")
+                        break
                     slot = event.key - ord("1")
                     if 0 <= slot <= save_manager.slot_number:
                         save = save_manager.get_state(slot)
@@ -88,16 +82,33 @@ def run():
         if state_machine.get_state().name == "choosing_save_to_save":
             for event in pygame_events:
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        state_machine.change_state("rendering")
+                        break
                     slot = event.key - ord("1")
                     if 0 <= slot <= save_manager.slot_number:
                         state = renderer.get_state()
                         save_manager.set_state(slot, state)
                         state_machine.change_state("rendering")
                         break
+        
+        if state_machine.get_state().name == "choosing_save_to_remove":
+            for event in pygame_events:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        state_machine.change_state("rendering")
+                        break
+                    slot = event.key - ord("1")
+                    if 0 <= slot <= save_manager.slot_number:
+                        save_manager.set_state(slot, None)
+                        state_machine.change_state("rendering")
+                        break
 
         if state_machine.get_state().name == "rendering":
             for event in pygame_events:
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.QUIT:
+                    return
+                elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_t:
                         renderer.maxIterations += 50
                         doRender = True
@@ -115,6 +126,9 @@ def run():
                         continue
                     elif event.key == pygame.K_l: # load state
                         state_machine.change_state("choosing_save_to_load")
+                        continue
+                    elif event.key == pygame.K_m: # load state
+                        state_machine.change_state("choosing_save_to_remove")
                         continue
 
             if keyboard.is_pressed('a'):
@@ -164,8 +178,12 @@ def run():
             renderer.cursorSpeed -= 50
             if renderer.cursorSpeed < 300:
                 renderer.cursorSpeed = 300
-        if showInfo:
+        
+        if state_machine.get_state().name.startswith("choosing_save"):
+            renderer.show_saves(save_manager.saves)
+        elif showInfo:
             renderer.show_info(fps)
+
         if not update:
             update = True
         pygame.display.update()

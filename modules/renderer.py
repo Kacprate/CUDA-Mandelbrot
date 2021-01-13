@@ -138,6 +138,22 @@ class Renderer:
             else:
                 print(f"Surface render time: {dt} seconds")
 
+    def show_saves(self, saves):
+        font = pygame.font.SysFont(None, self.fontSize)
+        text = []
+        for i, save in enumerate(saves):
+            if save:
+                txt = f"{i + 1}: timestamp: {save['timestamp']}, location: {save['center']}"
+            else:
+                txt = f"{i + 1}: Empty"
+            text.append(txt)
+
+        label = []
+        for line in text: 
+            label.append(font.render(line, True, (0, 0, 0)))
+        for line in range(len(label)):
+            self.display.blit(label[line], (10 , 10 + (line * self.fontSize) + (5 * line)))
+
     def show_info(self, fps):
         font = pygame.font.SysFont(None, self.fontSize)
         text = self.get_render_data(fps)

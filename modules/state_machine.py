@@ -6,9 +6,10 @@ class State:
 
 class State_Machine:
     def __init__(self):
-        self.states = {1: State("rendering", [2, 3]), 
+        self.states = {1: State("rendering", [2, 3, 4]), 
                        2: State("choosing_save_to_load", [1]),
-                       3: State("choosing_save_to_save", [1])}
+                       3: State("choosing_save_to_save", [1]),
+                       4: State("choosing_save_to_remove", [1])}
 
         self.names_to_id = {}
         for id, state in self.states.items():
