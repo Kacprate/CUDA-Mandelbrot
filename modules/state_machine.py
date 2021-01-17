@@ -5,14 +5,16 @@ class State:
         self.id = None
 
 class State_Machine:
-    def __init__(self):
-        self.states = {1: State("rendering", [2, 3, 4]), 
-                       2: State("choosing_save_to_load", [1]),
-                       3: State("choosing_save_to_save", [1]),
-                       4: State("choosing_save_to_remove", [1])}
+    def __init__(self, states):
+        if type(states) != dict:
+            raise TypeError("states must be a dictionary")
+
+        self.states = states
 
         self.names_to_id = {}
         for id, state in self.states.items():
+            if type(state) != State:
+                raise TypeError("All states in states dictionary must be of type State")
             self.names_to_id[state.name] = id
             state.id = id
             

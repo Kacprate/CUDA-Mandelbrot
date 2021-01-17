@@ -46,6 +46,7 @@ class Renderer:
         self.AUTO_LOWER_CURSORSPEED = data['AUTO_LOWER_CURSORSPEED'] # automatically lowers the cursor speed if the performance drops
         self.cursorSpeed = data['cursorSpeed'] # initial cursor movement speed, 300 is optimal for good performance, too low might cause no movement at all, too high might lower the framerate significantly
         self.fontSize = data['fontSize'] # information display font size
+        self.saves_font = pygame.font.SysFont(None, self.fontSize)
 
         # CUDA SETTINGS 
         self.griddim = data['cuda']['griddim'] # dimensions of the grid
@@ -139,7 +140,7 @@ class Renderer:
                 print(f"Surface render time: {dt} seconds")
 
     def show_saves(self, saves):
-        font = pygame.font.SysFont(None, self.fontSize)
+        font = self.saves_font
         text = []
         for i, save in enumerate(saves):
             if save:
