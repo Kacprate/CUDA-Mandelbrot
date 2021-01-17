@@ -13,5 +13,6 @@ Mandelbrot set rendered using CUDA
 - P - save location
 - L - load location
 - M - remove saved location
+- ESC - exit save/load/remove save menu
 
 ![Example](https://raw.githubusercontent.com/Kacprate/CUDA-Mandelbrot/master/example_image.jpg)
