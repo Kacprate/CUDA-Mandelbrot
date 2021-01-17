@@ -1,5 +1,5 @@
 # CUDA-Mandelbrot
-Mandelbrot set rendered using CUDA
+Mandelbrot set rendered using CUDA (numba, pygame)
 
 # Controlls:
 - WSAD - move

@@ -1,0 +1,4 @@
+pygame
+numba
+numpy
+keyboard

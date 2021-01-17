@@ -4,7 +4,6 @@ import time
 
 import numpy as np
 import pygame
-from bunch import Bunch
 from numba import cuda
 
 from modules.utils import HSVtoRGB, step_kernel
@@ -31,7 +30,7 @@ class Renderer:
         self.display.set_alpha(None)
         self.image = np.zeros((int(self.screen['x']), int(self.screen['y']), 3), dtype = np.float)
         self.d_image = cuda.to_device(self.image)
-        self.i = 0
+        self.step_index = 0
         self.surf = self.display
         self.finalZoomSize = finalZoomSize
         self.zooms = zooms
@@ -52,10 +51,38 @@ class Renderer:
         self.griddim = data['cuda']['griddim'] # dimensions of the grid
         self.blockdim = data['cuda']['blockdim'] # dimensions of the block
 
+    def change_iterations(self, delta):
+        self.maxIterations += delta
+        if self.maxIterations < 50:
+            self.maxIterations = 50
+
+    def change_cursor_speed(self, delta):
+        self.cursorSpeed += delta
+        if self.cursorSpeed < 150:
+            self.cursorSpeed = 150
+
+    def zoom_in(self):
+        self.step_index += 1
+        self.scale = math.floor(self.scale * self.zoomCoeff)
+        if self.step_index >= self.zooms:
+            self.step_index = self.zooms
+            self.scale = self.finalZoomSize
+
+    def zoom_out(self):
+        self.step_index -= 1
+        if self.step_index < 0:
+            self.step_index = 0
+        else:
+            self.scale = math.floor(self.scale / self.zoomCoeff)
+
+    def move_window(self, dx, dy):
+        self.center['x'] += dx / self.scale
+        self.center['y'] += dy / self.scale
+
     def get_state(self):
         state = dict()
         state["center"] = self.center.copy()
-        state["i"] = self.i
+        state["step_index"] = self.step_index
         state["cursorSpeed"] = self.cursorSpeed
         state["scale"] = self.scale
         state["maxIterations"] = self.maxIterations
@@ -65,18 +92,19 @@ class Renderer:
     def load_state(self, state):
         try:
             self.center = state["center"].copy()
-            self.i = state["i"]
+            self.step_index = state["step_index"]
             self.cursorSpeed = state["cursorSpeed"]
             self.scale = state["scale"]
             self.maxIterations = state["maxIterations"]
         except:
             raise Exception("Error while loading the state")
 
-        print("State loaded successfully")
+        if DEBUG:
+            print("State loaded successfully")
     
     def get_render_data(self, fps):
-        return [f"Step: {self.i}", 
-            f" - zooming progress: {math.floor(self.i / self.zooms * 100)}%", 
+        return [f"Step: {self.step_index}", 
+            f" - zooming progress: {math.floor(self.step_index / self.zooms * 100)}%", 
             f" - scaling per step: ~x{math.floor(self.zoomCoeff * 1000) / 1000}", 
             f"Zoom: x{self.scale}", f"Target zoom: x{self.finalZoomSize}", 
             f"Maximum function iterations per pixel: {self.maxIterations}", 
@@ -86,11 +114,8 @@ class Renderer:
             f"FPS: {int(fps)}"]
 
     def step(self, dx, dy, update):
-        if self.i >= self.zooms:
-            self.i = self.zooms
-            self.scale = self.finalZoomSize
-
-        print("Coordinates:", f" Re = {-self.center['x']} Im = {self.center['y']}")
+        if DEBUG:
+            print("Coordinates:", f" Re = {-self.center['x']} Im = {self.center['y']}")
 
         if update == True:
             if dx == 0 and dy == 0:

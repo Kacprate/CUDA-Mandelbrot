@@ -112,13 +112,11 @@ while running:
                 break
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_t:
-                    renderer.maxIterations += 50
+                    renderer.change_iterations(50)
                     doRender = True
                     update = False
                 elif event.key == pygame.K_g:
-                    renderer.maxIterations -= 50
-                    if renderer.maxIterations < 50:
-                        renderer.maxIterations = 50
+                    renderer.change_iterations(-50)
                     doRender = True
                     update = False
                 elif event.key == pygame.K_i:
@@ -146,19 +144,15 @@ while running:
             movey = -math.floor(renderer.cursorSpeed * moveDelta)
             doRender = True
         if keyboard.is_pressed('r'):
-            renderer.cursorSpeed += 1
+            renderer.change_cursor_speed(1)
         elif keyboard.is_pressed('f'):
-            renderer.cursorSpeed -= 1
-            if renderer.cursorSpeed < 150:
-                renderer.cursorSpeed = 150
+            renderer.change_cursor_speed(-1)
         if keyboard.is_pressed('q'):
-            renderer.i -= 1
-            renderer.scale = math.floor(renderer.scale / renderer.zoomCoeff)
+            renderer.zoom_out()
             doRender = True
             update = False
         elif keyboard.is_pressed('e'):
-            renderer.i += 1
-            renderer.scale = math.floor(renderer.scale * renderer.zoomCoeff)
+            renderer.zoom_in()
             doRender = True
             update = False
 
@@ -168,18 +162,17 @@ while running:
                 leng = abs(movex) + abs(movey)
                 movex = int(movex ** 2 / leng) * sign(movex)
                 movey = int(movey ** 2 / leng) * sign(movey)
-                renderer.center['x'] += movex / renderer.scale
-                renderer.center['y'] += movey / renderer.scale
+                renderer.move_window(movex, movey)
             renderer.step(movex, movey, update)
 
     renderer.display.blit(renderer.surf, (0, 0))
-    fps = 60
     if deltaTime != 0:
-        fps = 1/deltaTime
+        fps = 1 / deltaTime
+    else:
+        fps = 60
+
     if renderer.AUTO_LOWER_CURSORSPEED and fps < 15 and renderer.cursorSpeed > 300:
-        renderer.cursorSpeed -= 50
-        if renderer.cursorSpeed < 300:
-            renderer.cursorSpeed = 300
+        renderer.change_cursor_speed(-50)
     
     if state_machine.get_state().name.startswith("choosing_save"):
         renderer.show_saves(save_manager.saves)
@@ -188,6 +181,7 @@ while running:
 
     if not update:
         update = True
+
     pygame.display.update()
 
 pygame.quit()
