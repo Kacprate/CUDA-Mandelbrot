@@ -28,7 +28,7 @@ from modules.save_manager import Save_Manager
 from modules.state_machine import State, State_Machine
 from modules.utils import HSVtoRGB, lerp, sign
 
-logging.basicConfig(format='root logger %(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 # parse arguments
 parser = argparse.ArgumentParser(description='CUDA Mandelbrot argument parser')
