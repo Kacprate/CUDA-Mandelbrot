@@ -46,8 +46,7 @@ def iterate(d_image, x, i, j, screenY, cY, maxIterations, scale):
         z = z**2 + c
         if z.real ** 2 + z.imag ** 2 >= 4:
             break
-        else:
-            iteration = iteration + 1
+        iteration = iteration + 1
 
     h = (1 - iteration / maxIterations) * 360.0
     s = 1.0

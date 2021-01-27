@@ -8,13 +8,15 @@
 # - save multiple locations and settings
 # - argument parser
 # - tests
+# - logging
 # 3.2
 # - optimized the algorithm, now it's 6x more efficient in comparison to v3.0
 
+import argparse
+import logging
 import math
 import sys
 import time
-import argparse
 
 import keyboard
 import numpy as np
@@ -22,9 +24,11 @@ import pygame
 from numba import cuda
 
 from modules.renderer import Renderer
-from modules.utils import HSVtoRGB, lerp, sign
 from modules.save_manager import Save_Manager
-from modules.state_machine import State_Machine, State
+from modules.state_machine import State, State_Machine
+from modules.utils import HSVtoRGB, lerp, sign
+
+logging.basicConfig(format='root logger %(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 # parse arguments
 parser = argparse.ArgumentParser(description='CUDA Mandelbrot argument parser')
@@ -32,10 +36,11 @@ parser.add_argument('--config', dest='config', default="./config.json", help='Pa
 parser.add_argument('--saves', dest='saves', default="./saves/saves.json", help='Path to the saves file')
 args = parser.parse_args()
 
+# Renderer variables
 DEBUG = False # debug features
 showInfo = True # toggle information display on/off
-doRender = True
-update = False
+doRender = True # render scane
+update = False # True - evaluate only new pixels, False - evaluate all pixels
 
 pygame.init()
 pygame.display.set_caption('CUDA Mandelbrot Set renderer by Kacprate')
@@ -127,7 +132,7 @@ while running:
                 elif event.key == pygame.K_l: # load state
                     state_machine.change_state("choosing_save_to_load")
                     continue
-                elif event.key == pygame.K_m: # load state
+                elif event.key == pygame.K_m: # remove state
                     state_machine.change_state("choosing_save_to_remove")
                     continue
 
@@ -179,8 +184,7 @@ while running:
     elif showInfo:
         renderer.show_info(fps)
 
-    if not update:
-        update = True
+    update = True
 
     pygame.display.update()
 

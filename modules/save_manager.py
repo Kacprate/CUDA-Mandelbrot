@@ -1,4 +1,7 @@
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Save_Manager:
     def __init__(self, save_file_path, slots=5):
@@ -19,7 +22,7 @@ class Save_Manager:
             self.saves[index] = state
             return True
         except:
-            print(f"Could not save state on index {index}")
+            logger.warning(f"Could not save state on index {index}")
             return False
 
     def get_state(self, index):
@@ -27,5 +30,5 @@ class Save_Manager:
             state = self.saves[index]
             return state
         except:
-            print(f"Could not load save {index}")
+            logger.warning(f"Could not load save {index}")
             return None

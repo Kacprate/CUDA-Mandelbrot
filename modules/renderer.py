@@ -1,4 +1,5 @@
 import json
+import logging
 import math
 import time
 
@@ -8,7 +9,8 @@ from numba import cuda
 
 from modules.utils import HSVtoRGB, step_kernel
 
-DEBUG = False
+
+logger = logging.getLogger(__name__)
 
 class Renderer:
     def __init__(self, config):
@@ -99,8 +101,7 @@ class Renderer:
         except:
             raise Exception("Error while loading the state")
 
-        if DEBUG:
-            print("State loaded successfully")
+        logging.debug("State loaded successfully")
     
     def get_render_data(self, fps):
         return [f"Step: {self.step_index}", 
@@ -114,8 +115,7 @@ class Renderer:
             f"FPS: {int(fps)}"]
 
     def step(self, dx, dy, update):
-        if DEBUG:
-            print("Coordinates:", f" Re = {-self.center['x']} Im = {self.center['y']}")
+        logging.debug("Coordinates:", f" Re = {-self.center['x']} Im = {self.center['y']}")
 
         if update == True:
             if dx == 0 and dy == 0:
@@ -136,10 +136,10 @@ class Renderer:
         step_kernel[self.griddim, self.blockdim](self.d_image, int(self.screen['x']), int(self.screen['y']), self.center['x'], self.center['y'], self.maxIterations, self.scale, update, x1, x2, y1, y2, dx, dy)
         self.d_image.to_host()
 
-        if DEBUG:
+        if logger.isEnabledFor(logging.DEBUG):
             dt = int((time.time() - t1) * 1000) / 1000
             if dt != 0:
-                print(f"Step render time: {dt} seconds, FPS: {1 / dt}")
+                logger.debug(f"Step render time: {dt} seconds, FPS: {1 / dt}")
 
         t1 = time.time()
         if update:
@@ -157,12 +157,12 @@ class Renderer:
         else:
             self.surf = pygame.surfarray.make_surface(self.image)
 
-        if DEBUG:
+        if logger.isEnabledFor(logging.DEBUG):
             dt = int((time.time() - t1) * 1000) / 1000
             if dt != 0:
-                print(f"Surface render time: {dt} seconds, FPS: {1 / dt}")
+                logger.debug(f"Surface render time: {dt} seconds, FPS: {1 / dt}")
             else:
-                print(f"Surface render time: {dt} seconds")
+                logger.debug(f"Surface render time: {dt} seconds")
 
     def show_saves(self, saves):
         font = self.saves_font
